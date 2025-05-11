@@ -1,7 +1,9 @@
 import flet as ft
-from indexpage import generate_index_column
-from infopage import generate_info_column
-from choose_specialist import generate_specialist_column
+from .indexpage import generate_index_column
+from .infopage import generate_info_column
+from .choose_specialist import generate_specialist_column
+from .choose_time import generate_ctime_column
+from .choose_service import generate_service_column
 
 def get_switcher(view):
     return ft.AnimatedSwitcher(
@@ -73,6 +75,32 @@ def main(page: ft.Page):
                 scroll=ft.ScrollMode.ADAPTIVE
                 )
             )
+        elif page.route == "/choose_time":
+            page.views.append(
+                ft.View(
+                    "/choose_time",
+                    [
+                        ft.Container(
+                            content=generate_ctime_column(page),
+                            expand=True
+                        )
+                    ],
+                scroll=ft.ScrollMode.ADAPTIVE
+                )
+            )
+        elif page.route == "/choose_service":
+            page.views.append(
+                ft.View(
+                    "/choose_service",
+                    [
+                        ft.Container(
+                            content=generate_service_column(page),
+                            expand=True
+                        )
+                    ],
+                scroll=ft.ScrollMode.ADAPTIVE
+                )
+            )
         page.add(get_switcher(page.views[0]))
         page.update()
 
@@ -86,4 +114,3 @@ def main(page: ft.Page):
     page.go(page.route)
 
 
-ft.app(main, view=ft.WEB_BROWSER)  # asd , port=5000

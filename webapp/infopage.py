@@ -1,7 +1,6 @@
-
+from .settings import pmap, plogo
 import flet as ft
 import webbrowser
-from test import gen_map
 
 def gen_text(text, size):
     return ft.Text(
@@ -28,7 +27,7 @@ def header_row():
     return ft.Row(
                 controls=[
                     ft.Image(
-                        src=f"/personal_photo.jpg",
+                        src=plogo,
                         width=100,
                         height=100,
                         fit=ft.ImageFit.CONTAIN,
@@ -55,10 +54,10 @@ def generate_info_column(page):
             generate_row_text(ft.Icons.CONTACTS, "+7 917 366 62 91", 15),
             ft.GestureDetector(generate_row_text(ft.Icons.WEB, "www.youtube.ru", 15), on_tap=lambda _: webbrowser.open("https://discord.com")),
             gen_text("Расположение", 20),
-            ft.Image(src=f'/2025-02-10_21-17-58.png'),
+            ft.Image(src=pmap),
             gen_text("Расположение", 20),
-            ft.Image(src=f'/2025-02-10_21-17-58.png'),
+            ft.Image(src=pmap),
             gen_text("Расположение", 20),
-            ft.Image(src=f'/2025-02-10_21-17-58.png')
+            ft.Image(src=pmap)
         ],
     )

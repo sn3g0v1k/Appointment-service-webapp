@@ -1,4 +1,9 @@
 import flet as ft
+from database.database import get_specialists, get_time_on_specialist, get_services_by_specialist
+from icecream import ic
+
+from .settings import plogo, pspecialist1
+
 
 def gen_text(text, size):
     return ft.Text(
@@ -22,7 +27,7 @@ def generate_header(page):
             ],
             alignment=ft.MainAxisAlignment.START,
         ),
-        bgcolor=ft.colors.GREY_200,
+        bgcolor=ft.Colors.GREY_200,
         border_radius=10,
         padding=10,
     )
@@ -31,7 +36,7 @@ def header_row():
     return ft.Row(
         controls=[
             ft.Image(
-                src=f"/personal_photo.jpg",
+                src=plogo,
                 width=50,
                 height=50,
                 fit=ft.ImageFit.CONTAIN,
@@ -46,8 +51,15 @@ def header_row():
         alignment=ft.MainAxisAlignment.START,
     )
 
+def button_clicked(name, profession, page):
+    data = get_time_on_specialist(name, profession)
+    ic(data, "got from database")
+    page.session.set("employee_data", data)
+    page.session.set("employee_name", name)
+    page.go("/choose_time")
 
-def generate_worker_row_column(name, profession, image_src, rewiews):
+
+def generate_worker_row_column(name, profession, image_src, rewiews, page):
     return ft.Column(controls=[ft.Container(
         content=ft.Column(
             controls=
@@ -58,9 +70,10 @@ def generate_worker_row_column(name, profession, image_src, rewiews):
     ),
     ft.Container(
         content=ft.ElevatedButton(
-            content=gen_text("Выбрать услугу", 16),
-            bgcolor=ft.colors.YELLOW,
-            color=ft.colors.BLACK,
+            content=gen_text("Выбрать время ", 16),
+            bgcolor=ft.Colors.YELLOW,
+            color=ft.Colors.BLACK,
+            on_click=lambda _: button_clicked(name, profession, page)
         ),
         padding=ft.padding.only(top=20),
     )])
@@ -80,11 +93,11 @@ def generate_worker_row(name, profession, image_src, rewiews):
                                         gen_text(profession, 14),
                                         ft.Row(
                                             controls=[
-                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.YELLOW, size=18),
-                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.YELLOW, size=18),
-                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.YELLOW, size=18),
-                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.YELLOW, size=18),
-                                                ft.Icon(name=ft.icons.STAR, color=ft.colors.YELLOW, size=18),
+                                                ft.Icon(name=ft.icons.STAR, color=ft.Colors.YELLOW, size=18),
+                                                ft.Icon(name=ft.icons.STAR, color=ft.Colors.YELLOW, size=18),
+                                                ft.Icon(name=ft.icons.STAR, color=ft.Colors.YELLOW, size=18),
+                                                ft.Icon(name=ft.icons.STAR, color=ft.Colors.YELLOW, size=18),
+                                                ft.Icon(name=ft.icons.STAR, color=ft.Colors.YELLOW, size=18),
                                                 gen_text(rewiews, 14),
                                             ],
                                             alignment=ft.MainAxisAlignment.START,
@@ -97,15 +110,16 @@ def generate_worker_row(name, profession, image_src, rewiews):
                         ),
     ]
 
-def generate_specialist_column(page):
-    return ft.Column(
-        controls=[
-            generate_header(page),
-            generate_worker_row_column("@sn3g0v1k20 \"GenZGuy\"", "тренер по прыжкам с крыши", f"/specialist1.jpg", "87 отзывов"),
-            generate_worker_row_column("@sn3g0v1k20 Aurudin", "тренер по гандболу", f"/specialist1.jpg",
-                                       "1 отзывов")
+#generate_worker_row_column("@sn3g0v1k20 Aurudin", "тренер по гандболу", f"/specialist1.jpg",
+#                                       "1 отзывов")
 
-        ],
+def generate_specialist_column(page):
+    controls = [generate_header(page),]
+    sps = get_specialists()
+    for sp in sps:
+        controls.append(generate_worker_row_column(sp[0], get_services_by_specialist(sp[0]), pspecialist1, "5 отзывов", page))
+    return ft.Column(
+        controls=controls,
         spacing=10,
         scroll=ft.ScrollMode.ADAPTIVE
     )

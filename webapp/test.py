@@ -1,48 +1,37 @@
-import random
 import flet as ft
-import flet.map as map
 
-
-def gen_map(page: ft.Page):
-    m = map.Map(
-            expand=True,
-            initial_center=map.MapLatitudeLongitude(54.732927, 55.923271),
-            initial_zoom=18,
-            interaction_configuration=map.MapInteractionConfiguration(
-                flags=map.MapInteractiveFlag.ALL
-            ),
-            layers=[
-                map.TileLayer(
-                    url_template="https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
+def main(page: ft.Page):
+    page.add(
+        ft.DataTable(
+            columns=[
+                ft.DataColumn(ft.Text("")),
+                ft.DataColumn(ft.Text("")),
+                ft.DataColumn(ft.Text("") ),
+            ],
+            rows=[
+                ft.DataRow(
+                    cells=[
+                        ft.DataCell(ft.Text("John")),
+                        ft.DataCell(ft.Text("Smith")),
+                        ft.DataCell(ft.Text("43")),
+                    ],
                 ),
-                map.RichAttribution(
-                    attributions=[
-                        map.TextSourceAttribution(
-                            text="OpenStreetMap Contributors",
-                            on_click=lambda e: e.page.launch_url(
-                                "https://openstreetmap.org/copyright"
-                            ),
-                        ),
-                        map.TextSourceAttribution(
-                            text="Flet",
-                            on_click=lambda e: e.page.launch_url("https://flet.dev"),
-                        ),
-                    ]
+                ft.DataRow(
+                    cells=[
+                        ft.DataCell(ft.Text("Jack")),
+                        ft.DataCell(ft.Text("Brown")),
+                        ft.DataCell(ft.Text("19")),
+                    ],
                 ),
-                map.SimpleAttribution(
-                    text="Flet",
-                    alignment=ft.alignment.top_right,
+                ft.DataRow(
+                    cells=[
+                        ft.DataCell(ft.Text("Alice")),
+                        ft.DataCell(ft.Text("Wong")),
+                        ft.DataCell(ft.Text("25")),
+                    ],
                 ),
             ],
-
-        )
-
-    page.add(
-        m
+        ),
     )
-    page.update()
-    return m
 
-
-
-
+ft.app(main)
