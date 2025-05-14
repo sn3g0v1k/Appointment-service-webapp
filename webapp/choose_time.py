@@ -1,9 +1,7 @@
 import flet as ft
 import datetime
 
-from flet.core.border_radius import horizontal
-
-from database.database import get_time_on_date
+from webapp.database import get_time_on_date
 from icecream import ic
 
 from .settings import plogo

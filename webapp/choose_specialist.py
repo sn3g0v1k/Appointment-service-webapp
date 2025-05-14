@@ -1,5 +1,5 @@
 import flet as ft
-from database.database import get_specialists, get_time_on_specialist, get_services_by_specialist
+from webapp.database import get_specialists, get_time_on_specialist, get_services_by_specialist
 from icecream import ic
 
 from .settings import plogo, pspecialist1

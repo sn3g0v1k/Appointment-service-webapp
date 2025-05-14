@@ -7,8 +7,8 @@ from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart, Filter, CommandObject, Command
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
-from config import BOT_TOKEN, WEBAPP_URL, ADMIN_ID
-from database.database import add_new, create_db
+from config import ADMIN_ID, WEBAPP_URL, BOT_TOKEN
+from database import add_new, create_db
 
 
 # All handlers should be attached to the Router (or Dispatcher)

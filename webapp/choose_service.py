@@ -1,8 +1,6 @@
 import flet as ft
-from icecream import ic
-from unicodedata import category
 
-from database.database import service_n_cost_on_specialist_n_time
+from webapp.database import service_n_cost_on_specialist_n_time
 from .settings import plogo
 
 def gen_text(text, size):
