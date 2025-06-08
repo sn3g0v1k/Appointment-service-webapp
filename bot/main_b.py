@@ -21,16 +21,25 @@ class IsAdmin(Filter):
 
 
 
-def keyboard_f():
+def keyboard_f(user_idd):
     inline_kb_list = [
-        [InlineKeyboardButton(text="Веб приложение", web_app=WebAppInfo(url=WEBAPP_URL))]
+        [InlineKeyboardButton(text="Веб приложение", web_app=WebAppInfo(url=WEBAPP_URL+f"?tg_id={user_idd}"))]
     ]
     return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
 
 @dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
-
-    await message.answer(f"Hello, {html.bold(message.from_user.full_name)}!", reply_markup=keyboard_f())
+    # id = str(message.from_user.id)
+    # photo = await message.bot.get_user_profile_photos(message.from_user.id, 0, 1)
+    # try:
+    #     photo_id = photo.photos[0][0].file_id
+    # except IndexError:
+    #     new_user(conn, cursor, name=message.from_user.full_name, id=id,
+    #              url="https://ach-raion.gosuslugi.ru/netcat_files/9/260/MUZhChINA_2.jpg")
+    #     await message.answer(f"Hello, {message.from_user.full_name}", reply_markup=keyboard(id))
+    #     return
+    # url = profile_photo(photo_id, TOKEN)
+    await message.answer(f"Hello, {html.bold(message.from_user.full_name)}!", reply_markup=keyboard_f(message.from_user.id))
 
 
 @dp.message(Command("add_new_specialist"), IsAdmin())
