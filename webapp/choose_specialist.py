@@ -71,7 +71,7 @@ def generate_worker_row_column(name, profession, image_src, rewiews, page):
     ft.Container(
         content=ft.ElevatedButton(
             content=gen_text("Выбрать время ", 16),
-            bgcolor=ft.Colors.YELLOW,
+            bgcolor="#4b8c48",
             color=ft.Colors.BLACK,
             on_click=lambda _: button_clicked(name, profession, page)
         ),

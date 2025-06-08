@@ -54,10 +54,6 @@ def generate_info_column(page):
             generate_row_text(ft.Icons.CONTACTS, "+7 917 366 62 91", 15),
             ft.GestureDetector(generate_row_text(ft.Icons.WEB, "www.youtube.ru", 15), on_tap=lambda _: webbrowser.open("https://discord.com")),
             gen_text("Расположение", 20),
-            ft.Image(src=pmap),
-            gen_text("Расположение", 20),
-            ft.Image(src=pmap),
-            gen_text("Расположение", 20),
             ft.Image(src=pmap)
         ],
     )

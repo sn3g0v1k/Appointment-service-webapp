@@ -55,6 +55,7 @@ def header_row():
 
 def time_picked(time, date, page):
     page.session.set("nametimedate", (page.session.get("employee_name"), time, date))
+    ic((page.session.get("employee_name"), time, date))
     page.go("/choose_service")
 
 def generate_table(data: list, date, page):

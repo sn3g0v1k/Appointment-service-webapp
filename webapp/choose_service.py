@@ -1,7 +1,9 @@
 import flet as ft
+from icecream import ic
 
 from webapp.database import service_n_cost_on_specialist_n_time
-from .settings import plogo
+from .settings import plogo, company_name, office_adress
+
 
 def gen_text(text, size):
     return ft.Text(
@@ -16,6 +18,7 @@ def gen_text(text, size):
         ]
     )
 
+
 def generate_header(page):
     return ft.Container(
         content=ft.Row(
@@ -29,6 +32,7 @@ def generate_header(page):
         border_radius=10,
         padding=10,
     )
+
 
 def header_row():
     return ft.Row(
@@ -49,49 +53,74 @@ def header_row():
         alignment=ft.MainAxisAlignment.START,
     )
 
-def convert_list_into_dict(list):
-    dictionary = {}
-    for cortage in list:
-        dictionary[cortage[0]] = cortage[1]
-    return dictionary
+
+# def convert_list_into_dict(list):
+#     ic(list)
+#     dictionary = {}
+#     for cortage in list:
+#         dictionary[cortage[0]] = cortage[1]
+#     return dictionary
 
 def get_services(page):
     cort = page.session.get("nametimedate")
+    ic(cort)
     data = service_n_cost_on_specialist_n_time(cort[0], cort[1], cort[2])
-    return convert_list_into_dict(data)
+    ic(data)
+    # return convert_list_into_dict(data)
+    return data
+
+def button_pressed(services):
+    ic(services.value)
+
+
+
 
 def generate_service_column(page):
     # Данные услуг
     services = get_services(page)
 
-
     def build_services():
-        return ft.Column([
+        return ft.RadioGroup(ft.Column([
             *[
                 ft.Row([
                     ft.Column([
-                        ft.Text(service["name"]),
-                        ft.Text(service["price"], size=14)
+                        ft.Text(service[1]),
+                        ft.Text(service[0], size=14)
                     ], expand=True),
-                    ft.Checkbox(width=30)
+                    ft.Radio(width=30, value=service[1])
                 ]) for service in services
             ]
-        ])
+        ]))
 
-
-    return ft.Container(
-        content=ft.Column([
-            generate_header(page),
+    servviceess = build_services()
+    return ft.Column(
+        [
             ft.Container(
                 content=ft.Column([
-                    ft.Row([
-                        ft.Text("Chode", size=18, weight=ft.FontWeight.BOLD),
-                        ft.Text("ул. Чернышевского 3", size=14)
-                    ]),
-                    build_services()
+                    generate_header(page),
+                    ft.Container(
+                        content=ft.Column([
+                            ft.Row([
+                                ft.Text(company_name, size=18, weight=ft.FontWeight.BOLD),
+                                ft.Text(office_adress, size=14)
+                            ]),
+                            servviceess
+                        ]),
+                        padding=20
+                    )
                 ]),
-                padding=20
+                expand=True
+            ),
+            ft.Column(
+                [
+                    ft.ElevatedButton(
+                        content=gen_text("Cоздать запись", 16),
+                        bgcolor="#4b8c48",
+                        color=ft.Colors.BLACK,
+                        on_click=lambda _: button_pressed(servviceess)
+                    )
+                ],
+                alignment=ft.MainAxisAlignment.END
             )
-        ]),
-        expand=True
+        ]
     )

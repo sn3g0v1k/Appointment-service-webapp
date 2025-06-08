@@ -77,17 +77,13 @@ def generate_index_column(page: ft.Page):
             header_row(page),
             generate_row(ft.Icons.PEOPLE, "Выбрать тренера", "/choose_specialist", page),
             generate_row(ft.Icons.TIMER_ROUNDED, "Выбрать время", "/date", page),
-            generate_row(ft.Icons.SPORTS_VOLLEYBALL_OUTLINED, "Выбрать услугу", "/train", page)
+            generate_row(ft.Icons.SPORTS_VOLLEYBALL_OUTLINED, "Выбрать услугу", "/train", page),
+            ft.WebView(url="https://www.bashinform.ru/", expand=True, height=200),
+            # gen_text("YT: Shcoder", 40)
+            generate_row(ft.Icons.BOY, "Ваш профиль", "/profile", page)
         ],
         spacing=10,
         alignment=ft.MainAxisAlignment.START,
         horizontal_alignment=ft.CrossAxisAlignment.CENTER
     )
 
-# def main(page: ft.Page):
-#     page.title = "Training App"
-#     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-#     page.vertical_alignment = ft.MainAxisAlignment.START
-#     page.add(generate_index_column(page))
-#
-# ft.app(target=main)

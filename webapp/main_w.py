@@ -1,9 +1,14 @@
 import flet as ft
+from icecream import ic
+
 from .indexpage import generate_index_column
 from .infopage import generate_info_column
 from .choose_specialist import generate_specialist_column
 from .choose_time import generate_ctime_column
 from .choose_service import generate_service_column
+from .settings import bgcolor
+from .profile import generate_profile_column
+
 
 def get_switcher(view):
     return ft.AnimatedSwitcher(
@@ -34,6 +39,42 @@ def main(page: ft.Page):
     page.theme = ft.Theme(font_family="Caveat")  # Default app font
     page.scroll = ft.ScrollMode.ADAPTIVE
 
+    def create_appbar(nickname: str = "UserNick", avatar_url: str = "https://picsum.photos/id/1005/200/300"):
+        return ft.AppBar(
+            leading=None,  # Скрываем стандартный leading
+            title=ft.Row(
+                controls=[
+                    ft.Container(
+                        content=ft.Image(
+                            src=avatar_url,
+                            width=40,
+                            height=40,
+                            fit=ft.ImageFit.COVER,
+                        ),
+                        width=40,
+                        height=40,
+                        border_radius=20,  # Круглый аватар
+                        clip_behavior=ft.ClipBehavior.HARD_EDGE,
+                    ),
+                    ft.Text(
+                        nickname,
+                        size=18,
+                        weight=ft.FontWeight.BOLD,
+                        color=ft.Colors.ON_SURFACE,
+                    ),
+                ],
+                alignment=ft.MainAxisAlignment.START,
+                spacing=12,
+            ),
+            center_title=False,
+            bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
+            elevation=4,  # Легкая тень для современного вида
+            actions=[],
+            toolbar_height=60,  # Увеличиваем высоту для лучшего восприятия
+        )
+    page.appbar = create_appbar()
+    page.update()
+
     def route_change(route):
         page.views.clear()
         page.views.append(
@@ -42,13 +83,20 @@ def main(page: ft.Page):
                 [
                     ft.Container(
                         content=generate_index_column(page),
-                        expand=True
+                        expand=True,
+                        bgcolor=bgcolor
                     ),
                 ],
-                scroll=ft.ScrollMode.ADAPTIVE
+                scroll=ft.ScrollMode.ADAPTIVE,
+                        bgcolor=bgcolor
             )
         )
-
+        ic(page.route)
+        try:
+            tg_id = page.route.split("=")[1]
+            page.session.set("user_id", int(tg_id))
+        except:
+            pass
         if page.route == "/info":
             page.views.append(
                 ft.View(
@@ -56,10 +104,27 @@ def main(page: ft.Page):
                     [
                         ft.Container(
                             content=generate_info_column(page),
-                            expand=True
+                            expand=True,
+                        bgcolor=bgcolor
                         )
                     ],
-                scroll=ft.ScrollMode.ADAPTIVE
+                scroll=ft.ScrollMode.ADAPTIVE,
+                        bgcolor=bgcolor
+                )
+            )
+        elif page.route == "/profile":
+            page.views.append(
+                ft.View(
+                    "/profile",
+                    [
+                        ft.Container(
+                            content=generate_profile_column(page),
+                            expand=True,
+                        bgcolor=bgcolor
+                        )
+                    ],
+                scroll=ft.ScrollMode.ADAPTIVE,
+                        bgcolor=bgcolor
                 )
             )
         elif page.route == "/choose_specialist":
@@ -69,10 +134,12 @@ def main(page: ft.Page):
                     [
                         ft.Container(
                             content=generate_specialist_column(page),
-                            expand=True
+                            expand=True,
+                        bgcolor=bgcolor
                         )
                     ],
-                scroll=ft.ScrollMode.ADAPTIVE
+                scroll=ft.ScrollMode.ADAPTIVE,
+                        bgcolor=bgcolor
                 )
             )
         elif page.route == "/choose_time":
@@ -82,10 +149,12 @@ def main(page: ft.Page):
                     [
                         ft.Container(
                             content=generate_ctime_column(page),
-                            expand=True
+                            expand=True,
+                        bgcolor=bgcolor
                         )
                     ],
-                scroll=ft.ScrollMode.ADAPTIVE
+                scroll=ft.ScrollMode.ADAPTIVE,
+                        bgcolor=bgcolor
                 )
             )
         elif page.route == "/choose_service":
@@ -95,10 +164,12 @@ def main(page: ft.Page):
                     [
                         ft.Container(
                             content=generate_service_column(page),
-                            expand=True
+                            expand=True,
+                        bgcolor=bgcolor
                         )
                     ],
-                scroll=ft.ScrollMode.ADAPTIVE
+                scroll=ft.ScrollMode.ADAPTIVE,
+                        bgcolor=bgcolor
                 )
             )
         page.add(get_switcher(page.views[0]))
