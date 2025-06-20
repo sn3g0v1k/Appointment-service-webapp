@@ -129,6 +129,16 @@ def make_booking(user_id, service, specialist, date, time):
     conn.commit()
     conn.close()
 
+def get_profile_pic(user_id):
+    conn = sq.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT url FROM profile_pictures WHERE User_id=?", (user_id,))
+    data = c.fetchone()
+    conn.close()
+    ic(data)
+    return data[0]
+
+
 # conn = sq.connect(DB_PATH)
 # c = conn.cursor()
 # c.execute("""

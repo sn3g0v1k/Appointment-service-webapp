@@ -8,6 +8,8 @@ from aiogram.filters import CommandStart, Filter, CommandObject, Command
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo, CallbackQuery
 from aiogram.exceptions import TelegramBadRequest
 
+from bot.database import save_user_picture
+from bot.parse import profile_photo
 from config import ADMIN_ID, WEBAPP_URL, BOT_TOKEN
 from database import add_new, create_db, get_user_appointments
 
@@ -29,7 +31,14 @@ class IsAdmin(Filter):
 
 
 
-def keyboard_f(user_idd):
+async def keyboard_f(user_idd, message):
+    photo = await message.bot.get_user_profile_photos(message.from_user.id, 0, 1)
+    try:
+        photo_id = photo.photos[0][0].file_id
+        url = profile_photo(photo_id, BOT_TOKEN)
+    except IndexError:
+        url="https://ach-raion.gosuslugi.ru/netcat_files/9/260/MUZhChINA_2.jpg"
+    save_user_picture(user_idd, url)
     inline_kb_list = [
         [InlineKeyboardButton(text="📅 Записаться", web_app=WebAppInfo(url=WEBAPP_URL+f"?tg_id={user_idd}"))],
         [InlineKeyboardButton(text="📋 Мои записи", callback_data="my_appointments")]
@@ -45,7 +54,7 @@ async def command_start_handler(message: Message) -> None:
             "📅 Записаться на прием\n"
             "📋 Просмотреть свои записи\n"
             "❓ Получить информацию о специалистах",
-            reply_markup=keyboard_f(message.from_user.id)
+            reply_markup= await keyboard_f(message.from_user.id, message)
         )
     except Exception as e:
         logger.error(f"Ошибка при обработке команды /start: {str(e)}")
@@ -82,7 +91,7 @@ async def help_command(message: Message):
         "/my_appointments - Показать мои записи\n\n"
         "Для записи к специалисту нажмите кнопку 'Записаться'"
     )
-    await message.answer(help_text, reply_markup=keyboard_f(message.from_user.id))
+    await message.answer(help_text, reply_markup= await keyboard_f(message.from_user.id, message))
 
 @dp.message(Command("my_appointments"))
 async def my_appointments_command(message: Message):
@@ -132,7 +141,7 @@ async def echo_handler(message: Message) -> None:
     try:
         await message.answer(
             "Я не понимаю эту команду. Используйте /help для просмотра доступных команд.",
-            reply_markup=keyboard_f(message.from_user.id)
+            reply_markup=await keyboard_f(message.from_user.id, message)
         )
     except Exception as e:
         logger.error(f"Ошибка при обработке сообщения: {str(e)}")

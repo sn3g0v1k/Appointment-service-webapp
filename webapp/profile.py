@@ -2,7 +2,7 @@ from datetime import datetime
 
 import flet as ft
 
-from webapp.database import get_bookings_from_user_id
+from webapp.database import get_bookings_from_user_id, get_profile_pic
 
 
 def gen_text(text, size, weight="normal"):
@@ -43,6 +43,8 @@ def create_schedule_column(page: ft.Page):
 
 
 def generate_profile_column(page: ft.Page):
+    user_id = page.session.get("user_id")
+    get_profile_pic(user_id)
     return ft.Column(
         controls=[
             ft.Row(
@@ -52,7 +54,7 @@ def generate_profile_column(page: ft.Page):
                     ft.CircleAvatar(
                         radius=30,
                         bgcolor=ft.colors.BLUE_200,
-                        content=ft.Icon(ft.icons.PERSON, color=ft.colors.WHITE, size=40)
+                        content=ft.Image(src=url)
                     ),
                     ft.Column(
                         spacing=5,

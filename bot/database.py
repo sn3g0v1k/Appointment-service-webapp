@@ -70,3 +70,18 @@ def get_user_appointments(user_id):
     except Exception as e:
         logger.error(f"Ошибка при получении записей пользователя: {str(e)}")
         raise
+
+def save_user_picture(user_id, pic_url):
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        cursor = conn.cursor()
+        cursor.execute('''
+                INSERT INTO profile_pictures (User_id, url)
+                VALUES (?, ?)
+            ''', (user_id, pic_url))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        conn.close()
+        logger.error(f"Ошибка при записи фотографии профиля пользователя: {str(e)}")
+        raise
