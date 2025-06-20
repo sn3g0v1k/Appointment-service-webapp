@@ -5,11 +5,19 @@ from aiogram import Bot, Dispatcher, html
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart, Filter, CommandObject, Command
-from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo, CallbackQuery
+from aiogram.exceptions import TelegramBadRequest
 
 from config import ADMIN_ID, WEBAPP_URL, BOT_TOKEN
-from database import add_new, create_db
+from database import add_new, create_db, get_user_appointments
 
+# Настройка логирования
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    filename='bot.log'
+)
+logger = logging.getLogger(__name__)
 
 # All handlers should be attached to the Router (or Dispatcher)
 
@@ -23,59 +31,120 @@ class IsAdmin(Filter):
 
 def keyboard_f(user_idd):
     inline_kb_list = [
-        [InlineKeyboardButton(text="Веб приложение", web_app=WebAppInfo(url=WEBAPP_URL+f"?tg_id={user_idd}"))]
+        [InlineKeyboardButton(text="📅 Записаться", web_app=WebAppInfo(url=WEBAPP_URL+f"?tg_id={user_idd}"))],
+        [InlineKeyboardButton(text="📋 Мои записи", callback_data="my_appointments")]
     ]
     return InlineKeyboardMarkup(inline_keyboard=inline_kb_list)
 
 @dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
-    # id = str(message.from_user.id)
-    # photo = await message.bot.get_user_profile_photos(message.from_user.id, 0, 1)
-    # try:
-    #     photo_id = photo.photos[0][0].file_id
-    # except IndexError:
-    #     new_user(conn, cursor, name=message.from_user.full_name, id=id,
-    #              url="https://ach-raion.gosuslugi.ru/netcat_files/9/260/MUZhChINA_2.jpg")
-    #     await message.answer(f"Hello, {message.from_user.full_name}", reply_markup=keyboard(id))
-    #     return
-    # url = profile_photo(photo_id, TOKEN)
-    await message.answer(f"Hello, {html.bold(message.from_user.full_name)}!", reply_markup=keyboard_f(message.from_user.id))
-
+    try:
+        await message.answer(
+            f"👋 Привет, {html.bold(message.from_user.full_name)}!\n\n"
+            "Я бот для записи к специалистам. С моей помощью вы можете:\n"
+            "📅 Записаться на прием\n"
+            "📋 Просмотреть свои записи\n"
+            "❓ Получить информацию о специалистах",
+            reply_markup=keyboard_f(message.from_user.id)
+        )
+    except Exception as e:
+        logger.error(f"Ошибка при обработке команды /start: {str(e)}")
+        await message.answer("Произошла ошибка. Пожалуйста, попробуйте позже.")
 
 @dp.message(Command("add_new_specialist"), IsAdmin())
-async def refund_command(message: Message, command: CommandObject):
+async def add_specialist_command(message: Message, command: CommandObject):
     try:
+        if not command.args:
+            await message.answer(
+                "Использование: /add_new_specialist специалист, услуга, время, id_клиента, занятость, дата, день_недели, цена за услугу\n"
+                "Пример: /add_new_specialist Артем Кириешков, стрижка овец, 8:00, None, N, 07.03.2025, fridayб 5000"
+            )
+            return
+
         args = command.args.split(", ")
-        specialist = args[0]
-        service = args[1]
-        time = args[2]
-        client_id = args[3]
-        is_busy = args[4]
-        date = args[5]
-        week_day = args[6]
-        add_new(specialist, service, time, client_id, is_busy, date, week_day) # /add_new_specialist Артем Кириешков, стрижка овец, 8:00, None, N, 07.03.2025, friday
-        #
-        await message.answer("Запись успешно добавлена!")
+        if len(args) != 7:
+            await message.answer("Неверное количество аргументов. Нужно 8 аргументов.")
+            return
+
+        specialist, service, time, client_id, is_busy, date, week_day, price = args
+        add_new(specialist, service, time, client_id, is_busy, date, week_day, price)
+        await message.answer("✅ Специалист успешно добавлен!")
     except Exception as e:
-        print('error', e)
+        logger.error(f"Ошибка при добавлении специалиста: {str(e)}")
+        await message.answer(f"❌ Произошла ошибка при добавлении записи. {str(e)}")
+
+@dp.message(Command("help"))
+async def help_command(message: Message):
+    help_text = (
+        "🤖 Доступные команды:\n\n"
+        "/start - Начать работу с ботом\n"
+        "/help - Показать это сообщение\n"
+        "/my_appointments - Показать мои записи\n\n"
+        "Для записи к специалисту нажмите кнопку 'Записаться'"
+    )
+    await message.answer(help_text, reply_markup=keyboard_f(message.from_user.id))
+
+@dp.message(Command("my_appointments"))
+async def my_appointments_command(message: Message):
+    try:
+        appointments = get_user_appointments(message.from_user.id)
+        if not appointments:
+            await message.answer("У вас пока нет записей.")
+            return
+
+        response = "📋 Ваши записи:\n\n"
+        for app in appointments:
+            response += (
+                f"👤 Специалист: {app['specialist']}\n"
+                f"🕒 Время: {app['time']}\n"
+                f"📅 Дата: {app['date']}\n"
+                f"🔧 Услуга: {app['service']}\n\n"
+            )
+        await message.answer(response)
+    except Exception as e:
+        logger.error(f"Ошибка при получении записей: {str(e)}")
+        await message.answer("Произошла ошибка при получении записей.")
+
+
+@dp.callback_query(lambda a: a.data=="my_appointments")
+async def my_appointments_command(query: CallbackQuery):
+    try:
+        appointments = get_user_appointments(query.from_user.id)
+        if not appointments:
+            await query.message.answer("У вас пока нет записей.")
+            return
+
+        response = "📋 Ваши записи:\n\n"
+        for app in appointments:
+            response += (
+                f"👤 Специалист: {app['specialist']}\n"
+                f"🕒 Время: {app['time']}\n"
+                f"📅 Дата: {app['date']}\n"
+                f"🔧 Услуга: {app['service']}\n\n"
+            )
+        await query.message.answer(response)
+    except Exception as e:
+        logger.error(f"Ошибка при получении записей: {str(e)}")
+        await query.message.answer("Произошла ошибка при получении записей.")
 
 @dp.message()
 async def echo_handler(message: Message) -> None:
     try:
-        # Send a copy of the received message
-        await message.send_copy(chat_id=message.chat.id)
-    except TypeError:
-        # But not all the types is supported to be copied so need to handle it
-        await message.answer("Nice try!")
-
+        await message.answer(
+            "Я не понимаю эту команду. Используйте /help для просмотра доступных команд.",
+            reply_markup=keyboard_f(message.from_user.id)
+        )
+    except Exception as e:
+        logger.error(f"Ошибка при обработке сообщения: {str(e)}")
 
 async def main() -> None:
-    # Initialize Bot instance with default bot properties which will be passed to all API calls
-    bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-    create_db()
-    # And the run events dispatching
-    await dp.start_polling(bot)
-
+    try:
+        bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+        create_db()
+        await dp.start_polling(bot)
+    except Exception as e:
+        logger.error(f"Критическая ошибка в боте: {str(e)}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)

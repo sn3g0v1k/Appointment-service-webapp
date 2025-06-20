@@ -25,43 +25,79 @@ def add_new(specialist, service, time, client_id, is_busy, date, week_day):
     conn.commit()
     conn.close()
 
+
+# def get_specialists():
+#     conn = sq.connect(DB_PATH)
+#     c = conn.cursor()
+#     c.execute("SELECT specialist FROM schedule")
+#     data = c.fetchall()
+#     print(list(set(data)))
+#     conn.close()
+#     return list(set(data))
+
 def get_specialists():
     conn = sq.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT specialist FROM schedule")
-    data = c.fetchall()
-    print(list(set(data)))
+    data = list(set(c.fetchall()))
     conn.close()
-    return list(set(data))
+    specialists = []
+    for row in data:
+        full_name = row[0].strip()
+        parts = full_name.split()
+        if len(parts) >= 2:
+            first_name, last_name = parts[0], ' '.join(parts[1:])
+        else:
+            first_name, last_name = full_name, ""
+        specialists.append((first_name, last_name))
+    return specialists
 
-def get_services_by_specialist(name):
+
+# def get_services_by_specialist(name):
+#     conn = sq.connect(DB_PATH)
+#     c = conn.cursor()
+#     c.execute("SELECT service FROM schedule WHERE specialist=?", (name,))
+#     data = c.fetchall()
+#     print(list(set(data)))
+#     conn.close()
+#     srvs = ''
+#     for i in list(set(data)):
+#         srvs += i[0] + ', '
+#     return srvs[:-2]
+
+def get_services_by_specialist(full_name):
     conn = sq.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("SELECT service FROM schedule WHERE specialist=?", (name,))
+    c.execute("SELECT service FROM schedule WHERE specialist=?", (full_name,))
     data = c.fetchall()
-    print(list(set(data)))
     conn.close()
-    srvs = ''
-    for i in list(set(data)):
-        srvs += i[0] + ', '
-    return srvs[:-2]
+
+    # Преобразуем список кортежей в список строк
+    services = [item[0] for item in data]
+    unique_services = list(set(services))  # Убираем дубликаты
+    print("Услуги:", unique_services)
+    return unique_services
+
 
 def get_time_on_specialist(name, profession):
     conn = sq.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("SELECT time, date, week_day FROM schedule WHERE specialist=? AND service=? AND is_busy=?", (name, profession, "N"))
+    c.execute("SELECT time, date, week_day FROM schedule WHERE specialist=? AND service=? AND is_busy=?",
+              (name, profession, "N"))
     data = c.fetchall()
     conn.close()
     return list(data)
 
+
 def get_time_on_date(date, name):
     conn = sq.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("SELECT time FROM schedule WHERE specialist=? AND date=?",
-              (name, date))
+    c.execute("SELECT time FROM schedule WHERE specialist=? AND date=? AND is_busy=?",
+              (name, date, "N"))
     data = set(c.fetchall())
     conn.close()
     return list(data)
+
 
 def service_n_cost_on_specialist_n_time(name, time, date):
     conn = sq.connect(DB_PATH)
@@ -70,6 +106,7 @@ def service_n_cost_on_specialist_n_time(name, time, date):
     data = c.fetchall()
     conn.close()
     return data
+
 
 def get_bookings_from_user_id(user_id):
     conn = sq.connect(DB_PATH)
@@ -80,6 +117,17 @@ def get_bookings_from_user_id(user_id):
     ic(data)
     return data
 
+
+def make_booking(user_id, service, specialist, date, time):
+    conn = sq.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("""
+        UPDATE schedule 
+        SET is_busy = 'Y', client_id = ? 
+        WHERE service = ? AND specialist = ? AND date = ? AND time = ?
+    """, (user_id, service, specialist, date, time))
+    conn.commit()
+    conn.close()
 
 # conn = sq.connect(DB_PATH)
 # c = conn.cursor()
