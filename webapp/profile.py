@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import flet as ft
+from icecream import ic
 
 from webapp.database import get_bookings_from_user_id, get_profile_pic
 
@@ -44,17 +45,24 @@ def create_schedule_column(page: ft.Page):
 
 def generate_profile_column(page: ft.Page):
     user_id = page.session.get("user_id")
-    url = get_profile_pic(user_id)
+    ic(get_profile_pic(user_id))
     return ft.Column(
         controls=[
             ft.Row(
                 alignment=ft.MainAxisAlignment.START,
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
                 controls=[
-                    ft.CircleAvatar(
-                        radius=30,
-                        bgcolor=ft.colors.BLUE_200,
-                        content=ft.Image(src=url)
+                    ft.Container(
+                        content=ft.Image(
+                            src=get_profile_pic(user_id),
+                            width=100,
+                            height=100,
+                            fit=ft.ImageFit.COVER,
+                        ),
+                        width=100,
+                        height=100,
+                        border_radius=50,
+                        clip_behavior=ft.ClipBehavior.HARD_EDGE,
                     ),
                     ft.Column(
                         spacing=5,

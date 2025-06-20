@@ -136,6 +136,8 @@ def get_profile_pic(user_id):
     data = c.fetchone()
     conn.close()
     ic(data)
+    if data is None:
+        return "https://avatars.fastly.steamstatic.com/dc77aa1e255492658605e8981ab7d0f4de6cc245_medium.jpg"
     return data[0]
 
 
