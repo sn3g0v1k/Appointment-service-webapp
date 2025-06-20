@@ -44,7 +44,7 @@ def create_schedule_column(page: ft.Page):
 
 def generate_profile_column(page: ft.Page):
     user_id = page.session.get("user_id")
-    get_profile_pic(user_id)
+    url = get_profile_pic(user_id)
     return ft.Column(
         controls=[
             ft.Row(
