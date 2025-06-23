@@ -129,16 +129,16 @@ def make_booking(user_id, service, specialist, date, time):
     conn.commit()
     conn.close()
 
-def get_profile_pic(user_id):
+def get_profile_pic_and_name(user_id):
     conn = sq.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("SELECT url FROM profile_pictures WHERE User_id=?", (user_id,))
+    c.execute("SELECT url, nickname FROM profile_pictures WHERE User_id=?", (user_id,))
     data = c.fetchone()
     conn.close()
     ic(data)
     if data is None:
-        return "https://avatars.fastly.steamstatic.com/dc77aa1e255492658605e8981ab7d0f4de6cc245_medium.jpg"
-    return data[0]
+        return "https://avatars.fastly.steamstatic.com/dc77aa1e255492658605e8981ab7d0f4de6cc245_medium.jpg", "Guest"
+    return data
 
 
 # conn = sq.connect(DB_PATH)

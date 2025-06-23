@@ -46,6 +46,9 @@ def create_schedule_column(page: ft.Page):
 def generate_profile_column(page: ft.Page):
     user_id = page.session.get("user_id")
     ic(get_profile_pic(user_id))
+    data = get_profile_pic(user_id)
+    url = get_profile_pic(user_id)[0]
+    us_name = get_profile_pic(user_id)[1]
     return ft.Column(
         controls=[
             ft.Row(
@@ -54,7 +57,7 @@ def generate_profile_column(page: ft.Page):
                 controls=[
                     ft.Container(
                         content=ft.Image(
-                            src=get_profile_pic(user_id),
+                            src=url,
                             width=100,
                             height=100,
                             fit=ft.ImageFit.COVER,
@@ -67,7 +70,7 @@ def generate_profile_column(page: ft.Page):
                     ft.Column(
                         spacing=5,
                         controls=[
-                            gen_text("YourNickname", 28, "bold"),
+                            gen_text(us_name, 28, "bold"),
                             ft.Text(f"id: {page.session.get('user_id')}", style=ft.TextThemeStyle.BODY_MEDIUM)
                         ]
                     )

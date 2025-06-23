@@ -8,7 +8,7 @@ from aiogram.filters import CommandStart, Filter, CommandObject, Command
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo, CallbackQuery
 from aiogram.exceptions import TelegramBadRequest
 
-
+from bot.database import save_user_picture_and_nickname
 from parse import profile_photo
 from config import ADMIN_ID, WEBAPP_URL, BOT_TOKEN
 from database import add_new, create_db, get_user_appointments, save_user_picture
@@ -37,8 +37,8 @@ async def keyboard_f(user_idd, message):
         photo_id = photo.photos[0][0].file_id
         url = profile_photo(photo_id, BOT_TOKEN)
     except IndexError:
-        url="https://ach-raion.gosuslugi.ru/netcat_files/9/260/MUZhChINA_2.jpg"
-    save_user_picture(user_idd, url)
+        url="https://avatars.fastly.steamstatic.com/dc77aa1e255492658605e8981ab7d0f4de6cc245_medium.jpg"
+    save_user_picture_and_nickname(user_idd, url, message.from_user.full_name)
     inline_kb_list = [
         [InlineKeyboardButton(text="📅 Записаться", web_app=WebAppInfo(url=WEBAPP_URL+f"?tg_id={user_idd}"))],
         [InlineKeyboardButton(text="📋 Мои записи", callback_data="my_appointments")]
