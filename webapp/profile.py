@@ -3,7 +3,7 @@ from datetime import datetime
 import flet as ft
 from icecream import ic
 
-from webapp.database import get_bookings_from_user_id, get_profile_pic
+from database import get_bookings_from_user_id
 
 
 def gen_text(text, size, weight="normal"):
