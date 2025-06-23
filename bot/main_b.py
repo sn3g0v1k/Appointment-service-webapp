@@ -8,10 +8,9 @@ from aiogram.filters import CommandStart, Filter, CommandObject, Command
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo, CallbackQuery
 from aiogram.exceptions import TelegramBadRequest
 
-from bot.database import save_user_picture_and_nickname
 from parse import profile_photo
 from config import ADMIN_ID, WEBAPP_URL, BOT_TOKEN
-from database import add_new, create_db, get_user_appointments, save_user_picture
+from database import add_new, create_db, get_user_appointments, save_user_picture, save_user_picture_and_nickname
 
 # Настройка логирования
 logging.basicConfig(
