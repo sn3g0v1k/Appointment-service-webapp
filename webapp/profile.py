@@ -3,7 +3,7 @@ from datetime import datetime
 import flet as ft
 from icecream import ic
 
-from .database import get_bookings_from_user_id
+from .database import get_bookings_from_user_id, get_profile_pic_and_name
 
 
 def gen_text(text, size, weight="normal"):
@@ -45,10 +45,10 @@ def create_schedule_column(page: ft.Page):
 
 def generate_profile_column(page: ft.Page):
     user_id = page.session.get("user_id")
-    ic(get_profile_pic(user_id))
-    data = get_profile_pic(user_id)
-    url = get_profile_pic(user_id)[0]
-    us_name = get_profile_pic(user_id)[1]
+    ic(get_profile_pic_and_name(user_id))
+    data = get_profile_pic_and_name(user_id)
+    url = get_profile_pic_and_name(user_id)[0]
+    us_name = get_profile_pic_and_name(user_id)[1]
     return ft.Column(
         controls=[
             ft.Row(
