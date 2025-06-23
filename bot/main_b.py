@@ -10,7 +10,7 @@ from aiogram.exceptions import TelegramBadRequest
 
 from parse import profile_photo
 from config import ADMIN_ID, WEBAPP_URL, BOT_TOKEN
-from database import add_new, create_db, get_user_appointments, save_user_picture, save_user_picture_and_nickname
+from database import add_new, create_db, get_user_appointments, save_user_picture_and_nickname
 
 # Настройка логирования
 logging.basicConfig(
