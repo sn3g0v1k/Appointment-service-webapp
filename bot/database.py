@@ -76,6 +76,28 @@ def save_user_picture_and_nickname(user_id, pic_url, nickname):
     try:
         cursor = conn.cursor()
         cursor.execute('''
+                SELECT * FROM profile_pictures WHERE User_id=?
+            ''',
+                       (user_id)
+                       )
+        data = cursor.fetchall()
+        if len(data) == 1:
+            cursor.execute('''
+                            UPDATE url, nickname IN profile_pictures WHERE User_id=?
+                            VALUES (?, ?)
+                        ''', (user_id, pic_url, nickname))
+            conn.commit()
+            conn.close()
+            return
+        elif len(data) > 1:
+            cursor.execute('''
+                            DELETE FROM profile_pictures WHERE User_id=?
+                        ''',
+                           (user_id)
+                           )
+            conn.commit()
+
+        cursor.execute('''
                 INSERT INTO profile_pictures (User_id, url, nickname)
                 VALUES (?, ?, ?)
             ''', (user_id, pic_url, nickname))
