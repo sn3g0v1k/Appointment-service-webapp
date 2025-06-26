@@ -46,7 +46,7 @@ async def keyboard_f(user_idd, message):
 
 @dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
-    try:
+    # try:
         await message.answer(
             f"👋 Привет, {html.bold(message.from_user.full_name)}!\n\n"
             "Я бот для записи к специалистам. С моей помощью вы можете:\n"
@@ -55,9 +55,9 @@ async def command_start_handler(message: Message) -> None:
             "❓ Получить информацию о специалистах",
             reply_markup= await keyboard_f(message.from_user.id, message)
         )
-    except Exception as e:
-        logger.error(f"Ошибка при обработке команды /start: {str(e)}")
-        await message.answer("Произошла ошибка. Пожалуйста, попробуйте позже.")
+    # except Exception as e:
+    #     logger.error(f"Ошибка при обработке команды /start: {str(e)}")
+    #     await message.answer("Произошла ошибка. Пожалуйста, попробуйте позже.")
 
 @dp.message(Command("add_new_specialist"), IsAdmin())
 async def add_specialist_command(message: Message, command: CommandObject):

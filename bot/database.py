@@ -78,7 +78,7 @@ def save_user_picture_and_nickname(user_id, pic_url, nickname):
         cursor.execute('''
                 SELECT * FROM profile_pictures WHERE User_id=?
             ''',
-                       (user_id)
+                       (user_id,)
                        )
         data = cursor.fetchall()
         if len(data) == 1:
@@ -93,7 +93,7 @@ def save_user_picture_and_nickname(user_id, pic_url, nickname):
             cursor.execute('''
                             DELETE FROM profile_pictures WHERE User_id=?
                         ''',
-                           (user_id)
+                           (user_id,)
                            )
             conn.commit()
 
