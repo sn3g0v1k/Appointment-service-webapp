@@ -83,8 +83,7 @@ def save_user_picture_and_nickname(user_id, pic_url, nickname):
         data = cursor.fetchall()
         if len(data) == 1:
             cursor.execute('''
-                            UPDATE url, nickname IN profile_pictures WHERE User_id=?
-                            VALUES (?, ?)
+                            UPDATE profile_pictures SET url=?, nickname=? WHERE User_id=?
                         ''', (user_id, pic_url, nickname))
             conn.commit()
             conn.close()
