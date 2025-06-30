@@ -49,24 +49,18 @@ def generate_profile_column(page: ft.Page):
     data = get_profile_pic_and_name(user_id)
     url = get_profile_pic_and_name(user_id)[0]
     us_name = get_profile_pic_and_name(user_id)[1]
+    ic(url, us_name)
     return ft.Column(
         controls=[
             ft.Row(
                 alignment=ft.MainAxisAlignment.START,
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
-                controls=[
-                    ft.Container(
-                        content=ft.Image(
-                            src=url,
-                            width=100,
-                            height=100,
-                            fit=ft.ImageFit.COVER,
+                controls=[ft.CircleAvatar(
+                            foreground_image_src=url,
+                            # width=160,
+                            # height=160,
+                            # fit=ft.ImageFit.COVER,
                         ),
-                        width=100,
-                        height=100,
-                        border_radius=50,
-                        clip_behavior=ft.ClipBehavior.HARD_EDGE,
-                    ),
                     ft.Column(
                         spacing=5,
                         controls=[

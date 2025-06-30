@@ -3,6 +3,8 @@ import logging
 import os
 from pathlib import Path
 
+from icecream import ic
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 DB_PATH = os.path.join(BASE_DIR, 'database/database.db')
 
@@ -71,38 +73,42 @@ def get_user_appointments(user_id):
         logger.error(f"Ошибка при получении записей пользователя: {str(e)}")
         raise
 
+
 def save_user_picture_and_nickname(user_id, pic_url, nickname):
     conn = sqlite3.connect(DB_PATH)
     try:
         cursor = conn.cursor()
+
+        # Проверяем наличие записи
         cursor.execute('''
-                SELECT * FROM profile_pictures WHERE User_id=?
-            ''',
-                       (user_id,)
-                       )
+            SELECT * FROM profile_pictures WHERE User_id=?
+        ''', (user_id,))
         data = cursor.fetchall()
+
         if len(data) == 1:
+            # Обновляем существующую запись
             cursor.execute('''
-                            UPDATE profile_pictures SET url=?, nickname=? WHERE User_id=?
-                        ''', (user_id, pic_url, nickname))
-            conn.commit()
-            conn.close()
-            return
+                UPDATE profile_pictures SET url=?, nickname=? WHERE User_id=?
+            ''', (pic_url, nickname, user_id))  # <<< Правильный порядок параметров
+
         elif len(data) > 1:
+            # Удаляем дубли, если их больше одного
             cursor.execute('''
-                            DELETE FROM profile_pictures WHERE User_id=?
-                        ''',
-                           (user_id,)
-                           )
+                DELETE FROM profile_pictures WHERE User_id=?
+            ''', (user_id,))
             conn.commit()
 
+        # Вставляем новую запись
         cursor.execute('''
-                INSERT INTO profile_pictures (User_id, url, nickname)
-                VALUES (?, ?, ?)
-            ''', (user_id, pic_url, nickname))
+            INSERT INTO profile_pictures (User_id, url, nickname)
+            VALUES (?, ?, ?)
+        ''', (user_id, pic_url, nickname))
+
         conn.commit()
         conn.close()
+        ic("c функцией все норм", len(data))
+
     except Exception as e:
-        conn.close()
         logger.error(f"Ошибка при записи профиля пользователя: {str(e)}")
+        conn.close()
         raise
