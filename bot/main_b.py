@@ -33,12 +33,12 @@ class IsAdmin(Filter):
 
 async def keyboard_f(user_idd, message):
     photo = await message.bot.get_user_profile_photos(message.from_user.id, 0, 1)
-    # try:
-    photo_id = photo.photos[0][0].file_id
-    url = profile_photo(photo_id, BOT_TOKEN)
-    ic("ЫЗАЫВАЗЫВЗАОЫВЩШАОЫВЩШАОЫВЩШАОЫЩВШОА", url)
-    # except IndexError:
-    #     url="https://avatars.fastly.steamstatic.com/dc77aa1e255492658605e8981ab7d0f4de6cc245_medium.jpg"
+    try:
+        photo_id = photo.photos[0][0].file_id
+        url = profile_photo(photo_id, BOT_TOKEN)
+        ic("ЫЗАЫВАЗЫВЗАОЫВЩШАОЫВЩШАОЫВЩШАОЫЩВШОА", url)
+    except IndexError:
+        url = "https://avatars.fastly.steamstatic.com/dc77aa1e255492658605e8981ab7d0f4de6cc245_medium.jpg"
     save_user_picture_and_nickname(user_idd, url, message.from_user.full_name)
     inline_kb_list = [
         [InlineKeyboardButton(text="📅 Записаться", web_app=WebAppInfo(url=WEBAPP_URL+f"?tg_id={user_idd}"))],
